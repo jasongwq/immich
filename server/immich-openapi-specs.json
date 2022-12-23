@@ -2590,6 +2590,10 @@
             "items": {
               "type": "string"
             }
+          },
+          "ocr_info": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -3562,6 +3566,9 @@
           "machineLearningQueueCount": {
             "$ref": "#/components/schemas/JobCounts"
           },
+          "ocrQueueCount": {
+            "$ref": "#/components/schemas/JobCounts"
+          },
           "isThumbnailGenerationActive": {
             "type": "boolean"
           },
@@ -3573,6 +3580,9 @@
           },
           "isMachineLearningActive": {
             "type": "boolean"
+          },
+          "isOcrActive": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -3580,10 +3590,12 @@
           "metadataExtractionQueueCount",
           "videoConversionQueueCount",
           "machineLearningQueueCount",
+          "ocrQueueCount",
           "isThumbnailGenerationActive",
           "isMetadataExtractionActive",
           "isVideoConversionActive",
-          "isMachineLearningActive"
+          "isMachineLearningActive",
+          "isOcrActive"
         ]
       },
       "JobId": {
@@ -3592,7 +3604,8 @@
           "thumbnail-generation",
           "metadata-extraction",
           "video-conversion",
-          "machine-learning"
+          "machine-learning",
+          "image-ocr"
         ]
       },
       "JobStatusResponseDto": {

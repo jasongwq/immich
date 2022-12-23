@@ -24,6 +24,7 @@ export const reverseGeocodingProcessorName = 'reverse-geocoding';
 /**
  * Machine learning Queue Jobs
  */
+export const OcrProcessorName = 'image-ocr';
 
 export enum MachineLearningJobNameEnum {
   OBJECT_DETECTION = 'detect-object',

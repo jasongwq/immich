@@ -16,6 +16,7 @@ import { AssetUploadedProcessor } from './processors/asset-uploaded.processor';
 import { GenerateChecksumProcessor } from './processors/generate-checksum.processor';
 import { MachineLearningProcessor } from './processors/machine-learning.processor';
 import { MetadataExtractionProcessor } from './processors/metadata-extraction.processor';
+import { OcrProcessor } from './processors/ocr.processor';
 import { ThumbnailGeneratorProcessor } from './processors/thumbnail.processor';
 import { UserDeletionProcessor } from './processors/user-deletion.processor';
 import { VideoTranscodeProcessor } from './processors/video-transcode.processor';
@@ -95,6 +96,14 @@ import { VideoTranscodeProcessor } from './processors/video-transcode.processor'
           removeOnFail: false,
         },
       },
+      {
+        name: QueueNameEnum.OCR,
+        defaultJobOptions: {
+          attempts: 3,
+          removeOnComplete: true,
+          removeOnFail: false,
+        },
+      },
     ),
     CommunicationModule,
   ],
@@ -108,7 +117,8 @@ import { VideoTranscodeProcessor } from './processors/video-transcode.processor'
     GenerateChecksumProcessor,
     MachineLearningProcessor,
     UserDeletionProcessor,
+    OcrProcessor,
   ],
   exports: [],
 })
-export class MicroservicesModule {}
+export class MicroservicesModule { }

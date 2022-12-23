@@ -5,6 +5,7 @@ import {
   IThumbnailGenerationJob,
   IVideoTranscodeJob,
   MachineLearningJobNameEnum,
+  OcrProcessorName,
   QueueNameEnum,
   videoMetadataExtractionProcessorName,
 } from '@app/job';
@@ -18,6 +19,8 @@ import { AssetType } from '@app/database/entities/asset.entity';
 import { GetJobDto, JobId } from './dto/get-job.dto';
 import { JobStatusResponseDto } from './response-dto/job-status-response.dto';
 import { IMachineLearningJob } from '@app/job/interfaces/machine-learning.interface';
+import { IOcrJob } from '@app/job/interfaces/ocr.interface';
+
 
 @Injectable()
 export class JobService {
@@ -34,12 +37,16 @@ export class JobService {
     @InjectQueue(QueueNameEnum.MACHINE_LEARNING)
     private machineLearningQueue: Queue<IMachineLearningJob>,
 
+    @InjectQueue(QueueNameEnum.OCR)
+    private OcrQueue: Queue<IOcrJob>,
+
     @Inject(ASSET_REPOSITORY)
     private _assetRepository: IAssetRepository,
   ) {
     this.thumbnailGeneratorQueue.empty();
     this.metadataExtractionQueue.empty();
     this.videoConversionQueue.empty();
+    this.OcrQueue.empty();
   }
 
   async startJob(jobDto: GetJobDto): Promise<number> {
@@ -52,6 +59,8 @@ export class JobService {
         return 0;
       case JobId.MACHINE_LEARNING:
         return this.runMachineLearningPipeline();
+      case JobId.OCR:
+        return this.runOcrPipeline();
       default:
         throw new BadRequestException('Invalid job id');
     }
@@ -62,6 +71,8 @@ export class JobService {
     const metadataExtractionJobCount = await this.metadataExtractionQueue.getJobCounts();
     const videoConversionJobCount = await this.videoConversionQueue.getJobCounts();
     const machineLearningJobCount = await this.machineLearningQueue.getJobCounts();
+    const ocrJobCount = await this.OcrQueue.getJobCounts();
+
 
     const response = new AllJobStatusResponseDto();
     response.isThumbnailGenerationActive = Boolean(thumbnailGeneratorJobCount.waiting);
@@ -72,6 +83,8 @@ export class JobService {
     response.videoConversionQueueCount = videoConversionJobCount;
     response.isMachineLearningActive = Boolean(machineLearningJobCount.waiting);
     response.machineLearningQueueCount = machineLearningJobCount;
+    response.isOcrActive = Boolean(ocrJobCount.waiting);
+    response.ocrQueueCount = ocrJobCount;
 
     return response;
   }
@@ -93,6 +106,11 @@ export class JobService {
       response.queueCount = await this.videoConversionQueue.getJobCounts();
     }
 
+    if (query.jobId === JobId.OCR) {
+      response.isActive = Boolean((await this.OcrQueue.getJobCounts()).waiting);
+      response.queueCount = await this.OcrQueue.getJobCounts();
+    }
+
     return response;
   }
 
@@ -109,6 +127,9 @@ export class JobService {
         return 0;
       case JobId.MACHINE_LEARNING:
         this.machineLearningQueue.empty();
+        return 0;
+      case JobId.OCR:
+        this.OcrQueue.empty();
         return 0;
       default:
         throw new BadRequestException('Invalid job id');
@@ -167,7 +188,11 @@ export class JobService {
     const assetWithNoSmartInfo = await this._assetRepository.getAssetWithNoSmartInfo();
 
     for (const asset of assetWithNoSmartInfo) {
-      await this.machineLearningQueue.add(MachineLearningJobNameEnum.IMAGE_TAGGING, { asset }, { jobId: randomUUID() });
+      await this.machineLearningQueue.add(
+        MachineLearningJobNameEnum.IMAGE_TAGGING,
+        { asset },
+        { jobId: randomUUID() }
+      );
       await this.machineLearningQueue.add(
         MachineLearningJobNameEnum.OBJECT_DETECTION,
         { asset },
@@ -176,5 +201,24 @@ export class JobService {
     }
 
     return assetWithNoSmartInfo.length;
+  }
+  private async runOcrPipeline(): Promise<number> {
+    const jobCount = await this.OcrQueue.getJobCounts();
+
+    if (jobCount.waiting > 0) {
+      throw new BadRequestException('Metadata extraction job is already running');
+    }
+
+    const assetWithNoSmartOcrInfo = await this._assetRepository.getAssetWithNoSmartOcrInfo();
+
+    for (const asset of assetWithNoSmartOcrInfo) {
+      await this.OcrQueue.add(
+        OcrProcessorName,
+        { asset },
+        { jobId: randomUUID() }
+      );
+    }
+
+    return assetWithNoSmartOcrInfo.length;
   }
 }

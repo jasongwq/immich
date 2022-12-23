@@ -6,6 +6,7 @@ export enum JobId {
   METADATA_EXTRACTION = 'metadata-extraction',
   VIDEO_CONVERSION = 'video-conversion',
   MACHINE_LEARNING = 'machine-learning',
+  OCR='image-ocr'
 }
 
 export class GetJobDto {

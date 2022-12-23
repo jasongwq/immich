@@ -70,9 +70,17 @@ import { UserModule } from '../user/user.module';
           removeOnFail: false,
         },
       },
+      {
+        name: QueueNameEnum.OCR,
+        defaultJobOptions: {
+          attempts: 3,
+          removeOnComplete: true,
+          removeOnFail: false,
+        },
+      },
     ),
   ],
   controllers: [JobController],
   providers: [JobService, ImmichJwtService],
 })
-export class JobModule {}
+export class JobModule { }
