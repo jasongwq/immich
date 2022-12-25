@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import LoadingSpinner from '../shared-components/loading-spinner.svelte';
 	import { api, AssetResponseDto } from '@api';
+	import PhotoImage from './photo-image.svelte';
 	import Keydown from 'svelte-keydown';
 	import {
 		notificationController,
@@ -17,6 +18,10 @@
 
 	let copyImageToClipboard: (src: string) => Promise<Blob>;
 
+	let canvasElement: HTMLCanvasElement;
+	let imgElement: HTMLImageElement;
+	
+
 	onMount(async () => {
 		const { data } = await api.assetApi.getAssetById(assetId);
 		assetInfo = data;
@@ -24,8 +29,10 @@
 		//Import hack :( see https://github.com/vadimkorr/svelte-carousel/issues/27#issuecomment-851022295
 		const module = await import('copy-image-clipboard');
 		copyImageToClipboard = module.copyImageToClipboard;
+
 	});
 
+		
 	const loadAssetData = async () => {
 		try {
 			const { data } = await api.assetApi.serveFile(assetInfo.id, false, true, {
@@ -71,12 +78,10 @@
 		{#await loadAssetData()}
 			<LoadingSpinner />
 		{:then assetData}
-			<img
-				transition:fade={{ duration: 150 }}
-				src={assetData}
-				alt={assetId}
-				class="object-contain h-full transition-all"
-				loading="lazy"
+		  <PhotoImage
+			assetId={assetId}
+			assetData={assetData}
+			assetInfo={assetInfo}
 			/>
 		{/await}
 	{/if}

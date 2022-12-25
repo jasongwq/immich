@@ -27,6 +27,7 @@ class JobId {
   static const metadataExtraction = JobId._(r'metadata-extraction');
   static const videoConversion = JobId._(r'video-conversion');
   static const machineLearning = JobId._(r'machine-learning');
+  static const imageOcr = JobId._(r'image-ocr');
 
   /// List of all possible values in this [enum][JobId].
   static const values = <JobId>[
@@ -34,6 +35,7 @@ class JobId {
     metadataExtraction,
     videoConversion,
     machineLearning,
+    imageOcr,
   ];
 
   static JobId? fromJson(dynamic value) => JobIdTypeTransformer().decode(value);
@@ -76,6 +78,7 @@ class JobIdTypeTransformer {
         case r'metadata-extraction': return JobId.metadataExtraction;
         case r'video-conversion': return JobId.videoConversion;
         case r'machine-learning': return JobId.machineLearning;
+        case r'image-ocr': return JobId.imageOcr;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');

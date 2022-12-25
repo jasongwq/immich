@@ -2,16 +2,18 @@ version: '3.8'
 
 services:
   immich-server:
-    image: immich-server-dev:latest
+    image: jasongwq/immich-server-dev:latest
     build:
       context: ../server
       dockerfile: Dockerfile
       target: builder
+    container_name: immich-server-dev
     command: npm run start:debug immich
     volumes:
       - ../server:/usr/src/app
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
-      - /usr/src/app/node_modules
+      - ./server_node_modules:/usr/src/app/node_modules
+#      - /usr/src/app/node_modules
     ports:
       - 9230:9230
     env_file:
@@ -22,26 +24,28 @@ services:
       - redis
       - database
 
-  immich-machine-learning:
-    image: immich-machine-learning-dev:latest
-    build:
-      context: ../machine-learning
-      dockerfile: Dockerfile
-      target: builder
-    command: npm run start:dev
-    volumes:
-      - ../machine-learning:/usr/src/app
-      - ${UPLOAD_LOCATION}:/usr/src/app/upload
-      - /usr/src/app/node_modules
-    env_file:
-      - .env
-    environment:
-      - NODE_ENV=development
-    depends_on:
-      - database
+#  immich-machine-learning:
+#    image: jasongwq/immich-machine-learning-dev:latest
+#    build:
+#      context: ../machine-learning
+#      dockerfile: Dockerfile
+#      target: builder
+#    command: npm run start:dev
+#    volumes:
+#      - ../machine-learning:/usr/src/app
+#      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      #- ./machine-learning_node_modules:/usr/src/app/node_modules1
+#      - /usr/src/app/node_modules
+#    env_file:
+#      - .env
+#    environment:
+#      - NODE_ENV=development
+#    depends_on:
+#      - database
 
   immich-microservices:
-    image: immich-microservices:latest
+    image: jasongwq/immich-microservices-dev:latest
+    #container_name: immich-microservices-dev
     build:
       context: ../server
       dockerfile: Dockerfile
@@ -50,17 +54,20 @@ services:
     volumes:
       - ../server:/usr/src/app
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
-      - /usr/src/app/node_modules
+      - ./microservices_node_modules:/usr/src/app/node_modules
+#      - /usr/src/app/node_modules
     env_file:
       - .env
     environment:
       - NODE_ENV=development
     depends_on:
+      - redis
       - database
       - immich-server
 
   immich-web:
-    image: immich-web-dev:1.9.0
+    image: jasongwq/immich-web-dev:latest
+    container_name: immich-web-dev
     build:
       context: ../web
       dockerfile: Dockerfile
@@ -76,17 +83,18 @@ services:
       - 24678:24678
     volumes:
       - ../web:/usr/src/app
+      #- ./web_node_modules:/usr/src/app/node_modules
       - /usr/src/app/node_modules
     restart: always
     depends_on:
       - immich-server
 
   redis:
-    container_name: immich_redis
+    container_name: immich_redis_dev
     image: redis:6.2
 
   database:
-    container_name: immich_postgres
+    container_name: immich_postgres_dev
     image: postgres:14
     env_file:
       - .env
@@ -96,13 +104,13 @@ services:
       POSTGRES_DB: ${DB_DATABASE_NAME}
       PG_DATA: /var/lib/postgresql/data
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./pgdata:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - 8121:5432
 
   immich-proxy:
-    container_name: immich_proxy
-    image: immich-proxy-dev:latest
+    container_name: immich_proxy_proxy
+    image: jasongwq/immich-proxy-dev:latest
     environment:
       # Make sure these values get passed through from the env file
       - IMMICH_SERVER_URL
@@ -111,12 +119,14 @@ services:
       context: ../nginx
       dockerfile: Dockerfile
     ports:
-      - 2283:8080
-    logging:
-      driver: none
+      - 8120:8080
+    #logging:
+    #  driver: none
     depends_on:
       - immich-server
     restart: always
 
-volumes:
-  pgdata:
+networks:
+  default:
+    external:
+     name: all

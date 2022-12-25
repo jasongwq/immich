@@ -104,6 +104,32 @@
 			});
 		}
 	};
+	const runImageOcr = async () => {
+		try {
+			const { data } = await api.jobApi.sendJobCommand(JobId.ImageOcr, {
+				command: JobCommand.Start
+			});
+
+			if (data) {
+				notificationController.show({
+					message: `Image OCR job started for ${data} asset`,
+					type: NotificationType.Info
+				});
+			} else {
+				notificationController.show({
+					message: `No missing Image OCR found`,
+					type: NotificationType.Info
+				});
+			}
+		} catch (e) {
+			console.log('[ERROR] runImageOcr', e);
+			
+			notificationController.show({
+				message: `Error running image ocr job, check console for more detail`,
+				type: NotificationType.Error
+			});
+		}
+	};
 </script>
 
 <div class="flex flex-col gap-10">
@@ -135,4 +161,12 @@
 	>
 		Note that some asset does not have any object detected, this is normal.
 	</JobTile>
+	<JobTile
+		title={'Image OCR'}
+		subtitle={'Run image ocr process to detect and classify objects'}
+		on:click={runImageOcr}
+		jobStatus={allJobsStatus?.isOcrActive}
+		waitingJobCount={allJobsStatus?.ocrQueueCount.waiting}
+		activeJobCount={allJobsStatus?.ocrQueueCount.active}
+	/>
 </div>

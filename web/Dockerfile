@@ -12,7 +12,7 @@ RUN apk add --no-cache setpriv
 
 COPY --chown=node:node package*.json ./
 
-RUN npm ci
+RUN http_proxy=https_proxy=http://192.168.31.111:7890 && npm ci
 
 COPY --chown=node:node . .
 

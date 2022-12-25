@@ -36,6 +36,11 @@ void main() {
       // TODO
     });
 
+    // JobCounts ocrQueueCount
+    test('to test the property `ocrQueueCount`', () async {
+      // TODO
+    });
+
     // bool isThumbnailGenerationActive
     test('to test the property `isThumbnailGenerationActive`', () async {
       // TODO
@@ -53,6 +58,11 @@ void main() {
 
     // bool isMachineLearningActive
     test('to test the property `isMachineLearningActive`', () async {
+      // TODO
+    });
+
+    // bool isOcrActive
+    test('to test the property `isOcrActive`', () async {
       // TODO
     });
 

@@ -227,6 +227,12 @@ export interface AllJobStatusResponseDto {
     'machineLearningQueueCount': JobCounts;
     /**
      * 
+     * @type {JobCounts}
+     * @memberof AllJobStatusResponseDto
+     */
+    'ocrQueueCount': JobCounts;
+    /**
+     * 
      * @type {boolean}
      * @memberof AllJobStatusResponseDto
      */
@@ -249,6 +255,12 @@ export interface AllJobStatusResponseDto {
      * @memberof AllJobStatusResponseDto
      */
     'isMachineLearningActive': boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AllJobStatusResponseDto
+     */
+    'isOcrActive': boolean;
 }
 /**
  * 
@@ -1038,7 +1050,8 @@ export const JobId = {
     ThumbnailGeneration: 'thumbnail-generation',
     MetadataExtraction: 'metadata-extraction',
     VideoConversion: 'video-conversion',
-    MachineLearning: 'machine-learning'
+    MachineLearning: 'machine-learning',
+    ImageOcr: 'image-ocr'
 } as const;
 
 export type JobId = typeof JobId[keyof typeof JobId];
@@ -1424,6 +1437,12 @@ export interface SmartInfoResponseDto {
      * @memberof SmartInfoResponseDto
      */
     'objects'?: Array<string> | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SmartInfoResponseDto
+     */
+    'ocr_info'?: string | null;
 }
 /**
  * 
