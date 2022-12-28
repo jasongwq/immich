@@ -1,5 +1,1 @@
 .env
-/web_node_modules
-/server_node_modules
-/microservices_node_modules
-/pgdata

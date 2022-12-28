@@ -12,7 +12,7 @@ services:
     volumes:
       - ../server:/usr/src/app
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
-      - ./server_node_modules:/usr/src/app/node_modules
+      - ../../immich_davdata/server_node_modules:/usr/src/app/node_modules
 #      - /usr/src/app/node_modules
     ports:
       - 9230:9230
@@ -54,7 +54,7 @@ services:
     volumes:
       - ../server:/usr/src/app
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
-      - ./microservices_node_modules:/usr/src/app/node_modules
+      - ../../immich_davdata/microservices_node_modules:/usr/src/app/node_modules
 #      - /usr/src/app/node_modules
     env_file:
       - .env
@@ -104,7 +104,7 @@ services:
       POSTGRES_DB: ${DB_DATABASE_NAME}
       PG_DATA: /var/lib/postgresql/data
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - ../../immich_davdata/pgdata:/var/lib/postgresql/data
     ports:
       - 8121:5432
 
